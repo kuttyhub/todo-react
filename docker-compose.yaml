@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:3000
+    working_dir: /frontend
+    command: "npm start"
+    environment:
+      backend_URL: backend
+
+  backend:
+    build: ./backend
+    ports: 
+      - 3001:3001
+    working_dir: /backend
+    command: "npm start"
+    environment:
+      DB_URL: mongodb://mongo:27017
+      PORT: 3001
+    volumes:
+      - type: bind
+        source: ./backend
+        target: /app
+    depends_on: 
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: always
+    working_dir: /data/db
+    ports: 
+      - 27017:27017
+    volumes:
+      - type: volume
+        source: db_data
+        target: /data/db
+
+volumes:
+  db_data:
